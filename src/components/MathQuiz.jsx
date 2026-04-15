@@ -3,7 +3,6 @@ import {
   generateQuestion,
   generateMultipleChoices,
   calculateScore,
-  getStreakMessage,
   DIFFICULTY_LEVELS
 } from '../utils/QuizLogic';
 import MathQuestionCard from './MathQuestionCard';
@@ -21,8 +20,8 @@ const MathQuiz = () => {
   const [streak, setStreak] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
-  const [gameStatus, setGameStatus] = useState('playing'); // playing, correct, wrong, finished
-  const [questionsAnswered, setQuestionsAnswered] = useState([]);
+  const [gameStatus, setGameStatus] = useState('start'); // start, playing, correct, wrong, finished
+  const [, setQuestionsAnswered] = useState([]);
   const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
   const [gameMode, setGameMode] = useState('timed'); // timed or unlimited
   const [showScorePopup, setShowScorePopup] = useState(false);
@@ -171,23 +170,31 @@ const MathQuiz = () => {
 
   // NOW define all useEffect hooks after callbacks
   useEffect(() => {
-    generateNewQuestion();
-
+    isComponentMountedRef.current = true;
+    
     return () => {
       isComponentMountedRef.current = false;
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (questionTimeoutRef.current) clearTimeout(questionTimeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (questionTimeoutRef.current) {
+        clearTimeout(questionTimeoutRef.current);
+        questionTimeoutRef.current = null;
+      }
     };
-  }, [generateNewQuestion]);
+  }, []);
 
   useEffect(() => {
     if (gameStatus === 'finished') return;
 
    if (timeLeft <= 0 && gameMode === 'timed') {
-      if (isComponentMountedRef.current) {
-        setGameStatus('finished');
-      }
-      return;
+      const finishTimer = setTimeout(() => {
+        if (isComponentMountedRef.current) {
+          setGameStatus('finished');
+        }
+      }, 0);
+      return () => clearTimeout(finishTimer);
     }
 
     if (gameMode !== 'timed' || gameStatus !== 'playing') {
@@ -205,7 +212,7 @@ const MathQuiz = () => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [gameMode, gameStatus]);
+  }, [gameMode, gameStatus, timeLeft]);
 
   useEffect(() => {
     if (gameStatus !== 'playing' || selectedAnswer !== null) {
@@ -214,10 +221,12 @@ const MathQuiz = () => {
     }
 
     if (questionTimeLeft <= 0) {
-      if (isComponentMountedRef.current) {
-        handleTimeUp();
-      }
-      return;
+      const upTimer = setTimeout(() => {
+        if (isComponentMountedRef.current) {
+          handleTimeUp();
+        }
+      }, 0);
+      return () => clearTimeout(upTimer);
     }
 
     if (questionTimeoutRef.current) clearTimeout(questionTimeoutRef.current);
@@ -231,13 +240,48 @@ const MathQuiz = () => {
     return () => {
       if (questionTimeoutRef.current) clearTimeout(questionTimeoutRef.current);
     };
-  }, [gameStatus, selectedAnswer, handleTimeUp]);
+  }, [gameStatus, selectedAnswer, handleTimeUp, questionTimeLeft]);
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+
+
+  if (gameStatus === 'start') {
+    return (
+      <div className="quiz-container">
+        <div className="floating-shapes">
+          <div className="floating-shape"></div>
+          <div className="floating-shape"></div>
+          <div className="floating-shape"></div>
+          <div className="floating-shape"></div>
+        </div>
+        <div className="game-header">
+          <svg className="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="startGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor:'#ff6b9d', stopOpacity:1}} />
+                <stop offset="50%" style={{stopColor:'#845ef7', stopOpacity:1}} />
+                <stop offset="100%" style={{stopColor:'#20c997', stopOpacity:1}} />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#startGrad)"/>
+            <text x="50" y="65" fontSize="40" fontWeight="bold" fill="white" textAnchor="middle" fontFamily="Fredoka">🧮</text>
+          </svg>
+          <h1 className="game-title">MATH MASTER</h1>
+          <p className="game-subtitle">Are you ready to test your math skills?</p>
+        </div>
+        <div className="finished-screen">
+          <div className="result-card">
+            <h2 className="result-title">Welcome to Math Master!</h2>
+            <p style={{textAlign: 'center', marginBottom: '20px', color: '#666'}}>
+              Answer as many questions as you can within the time limit. Each question has a 10 second limit.
+            </p>
+            <button className="btn-replay" onClick={handleReplay} style={{display: 'block', width: '100%'}}>
+              Start Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (gameStatus === 'finished') {
     const percentage = calculateScore(score, totalQuestions);

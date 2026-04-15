@@ -16,22 +16,14 @@ export const QUESTION_TYPES = {
 export const generateQuestion = (difficulty = DIFFICULTY_LEVELS.MEDIUM, type = QUESTION_TYPES.MIXED) => {
   let num1, num2, operator, answer;
   
-  const ranges = {
-    easy: { max: 10 },
-    medium: { max: 50 },
-    hard: { max: 100 }
-  };
   
-  const max = ranges[difficulty].max;
-  
-  // Choose operator
   let selectedType = type;
   if (type === QUESTION_TYPES.MIXED) {
     const operators = [QUESTION_TYPES.ADDITION, QUESTION_TYPES.SUBTRACTION, QUESTION_TYPES.MULTIPLICATION, QUESTION_TYPES.DIVISION];
     selectedType = operators[Math.floor(Math.random() * operators.length)];
   }
   
-  // Generate numbers based on difficulty
+  
   if (difficulty === DIFFICULTY_LEVELS.EASY) {
     num1 = Math.floor(Math.random() * 10) + 1;
     num2 = Math.floor(Math.random() * 10) + 1;
@@ -64,7 +56,7 @@ export const generateQuestion = (difficulty = DIFFICULTY_LEVELS.MEDIUM, type = Q
       num2 = Math.floor(Math.random() * (difficulty === DIFFICULTY_LEVELS.EASY ? 10 : difficulty === DIFFICULTY_LEVELS.MEDIUM ? 15 : 20)) + 1;
       answer = num1 * num2;
       break;
-    case QUESTION_TYPES.DIVISION:
+    case QUESTION_TYPES.DIVISION: {
       operator = '÷';
       // Ensure clean division
       const divisor = Math.floor(Math.random() * (difficulty === DIFFICULTY_LEVELS.EASY ? 10 : 15)) + 2;
@@ -73,6 +65,7 @@ export const generateQuestion = (difficulty = DIFFICULTY_LEVELS.MEDIUM, type = Q
       num2 = divisor;
       answer = quotient;
       break;
+    }
     default:
       operator = '+';
       answer = num1 + num2;
@@ -93,14 +86,32 @@ export const generateMultipleChoices = (correctAnswer, difficulty = DIFFICULTY_L
   const choices = [correctAnswer];
   
   // Generate wrong answers
-  while (choices.length < 4) {
+  let attempts = 0;
+  while (choices.length < 4 && attempts < 100) {
+    attempts++;
     let wrongAnswer;
     const variance = difficulty === DIFFICULTY_LEVELS.EASY ? 5 : difficulty === DIFFICULTY_LEVELS.MEDIUM ? 10 : 20;
     
     wrongAnswer = correctAnswer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * variance) + 1);
     
-    if (!choices.includes(wrongAnswer) && wrongAnswer >= 0) {
+    // Only force wrong answers to be non-negative if the correct answer is non-negative.
+    // Give up forcing after 20 attempts to prevent infinite loop.
+    if (correctAnswer >= 0 && wrongAnswer < 0 && attempts < 20) {
+      continue;
+    }
+    
+    if (!choices.includes(wrongAnswer)) {
       choices.push(wrongAnswer);
+    }
+  }
+
+  // Fallback in case the while loop exits without finding enough options
+  while(choices.length < 4) {
+    const fallback = correctAnswer + choices.length * 10;
+    if (!choices.includes(fallback)) {
+      choices.push(fallback);
+    } else {
+      choices.push(correctAnswer + choices.length * 5 + 1);
     }
   }
   

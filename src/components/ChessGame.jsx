@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   initializeBoard,
   movePiece,
@@ -27,6 +27,94 @@ const ChessGame = () => {
   const [aiThinking, setAiThinking] = useState(false);
   const [scores, setScores] = useState({ white: 0, black: 0, advantage: 0 });
   
+  // Use refs for cleanup
+  const aiTimerRef = useRef(null);
+  const isMountedRef = useRef(true);
+  
+  const makeMove = useCallback((from, to) => {
+    if (!isMountedRef.current) return false;
+    
+    setBoard(prevBoard => {
+      const piece = prevBoard[from[0]][from[1]];
+      if (!piece || !isValidMove(prevBoard, from, to, piece)) {
+        return prevBoard;
+      }
+      
+      const capturedPiece = prevBoard[to[0]][to[1]];
+      const newBoard = movePiece(prevBoard, from, to);
+      
+      const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const fromNotation = files[from[1]] + (8 - from[0]);
+      const toNotation = files[to[1]] + (8 - to[0]);
+      const capture = capturedPiece ? 'x' : '-';
+      const moveNotation = `${fromNotation}${capture}${toNotation}`;
+      
+      setGameHistory(prev => [...prev, `${currentPlayer} ${moveNotation}`]);
+      setCurrentPlayer(currentPlayer === COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+      setSelectedSquare(null);
+      
+      return newBoard;
+    });
+    
+    return true;
+  }, [currentPlayer]);
+  
+  const makeAIMove = useCallback(() => {
+    if (!isMountedRef.current) return;
+    
+    setBoard(prevBoard => {
+      let move = null;
+      
+      switch (difficulty) {
+        case 'Easy':
+          move = getAIMoveEasy(prevBoard, COLORS.BLACK);
+          break;
+        case 'Medium':
+          move = getAIMoveMedium(prevBoard, COLORS.BLACK);
+          break;
+        case 'Hard':
+          move = getAIMoveHard(prevBoard, COLORS.BLACK);
+          break;
+        default:
+          move = getAIMoveMedium(prevBoard, COLORS.BLACK);
+      }
+      
+      if (move) {
+        const piece = prevBoard[move.from[0]][move.from[1]];
+        if (piece && isValidMove(prevBoard, move.from, move.to, piece)) {
+          const capturedPiece = prevBoard[move.to[0]][move.to[1]];
+          const newBoard = movePiece(prevBoard, move.from, move.to);
+          
+          const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+          const fromNotation = files[move.from[1]] + (8 - move.from[0]);
+          const toNotation = files[move.to[1]] + (8 - move.to[0]);
+          const capture = capturedPiece ? 'x' : '-';
+          const moveNotation = `${fromNotation}${capture}${toNotation}`;
+          
+          setGameHistory(prev => [...prev, `BLACK ${moveNotation}`]);
+          setCurrentPlayer(COLORS.WHITE);
+          setSelectedSquare(null);
+          
+          return newBoard;
+        }
+      }
+      
+      return prevBoard;
+    });
+  }, [difficulty]);
+  
+  useEffect(() => {
+    isMountedRef.current = true;
+    
+    return () => {
+      isMountedRef.current = false;
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+        aiTimerRef.current = null;
+      }
+    };
+  }, []);
+  
   useEffect(() => {
     const newStatus = getGameStatus(board, currentPlayer);
     setGameStatus(newStatus);
@@ -43,15 +131,29 @@ const ChessGame = () => {
       return;
     }
     
-    if (currentPlayer === COLORS.BLACK && !aiThinking) {
-      setAiThinking(true);
-      const timer = setTimeout(() => {
-        makeAIMove();
-        setAiThinking(false);
-      }, 800);
-      return () => clearTimeout(timer);
+    // Clear any pending AI timer
+    if (aiTimerRef.current) {
+      clearTimeout(aiTimerRef.current);
+      aiTimerRef.current = null;
     }
-  }, [currentPlayer, board, aiThinking]);
+    
+    if (currentPlayer === COLORS.BLACK && !aiThinking && isMountedRef.current) {
+      setAiThinking(true);
+      aiTimerRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          makeAIMove();
+          setAiThinking(false);
+        }
+      }, 800);
+    }
+    
+    return () => {
+      if (aiTimerRef.current) {
+        clearTimeout(aiTimerRef.current);
+        aiTimerRef.current = null;
+      }
+    };
+  }, [currentPlayer, board, aiThinking, makeAIMove]);
   
   const makeAIMove = () => {
     let move = null;

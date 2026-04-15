@@ -6,14 +6,17 @@ const ScorePopup = ({ isVisible, onAnimationComplete }) => {
 
   useEffect(() => {
     if (isVisible) {
-      setAnimate(true);
+      const initTimer = setTimeout(() => setAnimate(true), 10);
       const timer = setTimeout(() => {
         setAnimate(false);
         setTimeout(() => {
           onAnimationComplete();
         }, 300);
       }, 1500);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(initTimer);
+        clearTimeout(timer);
+      };
     }
   }, [isVisible, onAnimationComplete]);
 
