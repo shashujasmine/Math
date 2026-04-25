@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
 :root {
-  --primary: #ff6b9d;
-  --primary-light: #ffa5c3;
-  --secondary: #845ef7;
-  --accent: #ffd43b;
-  --accent-2: #20c997;
-  --success: #51cf66;
-  --danger: #ff6b6b;
-  --warning: #ffd43b;
-  --text-dark: #212529;
-  --text-light: #f8f9fa;
-  --bg-1: #fff5f8;
-  --bg-2: #f0f3ff;
+  --primary: #39ff14;
+  --primary-light: #7fff5c;
+  --secondary: #ff6b00;
+  --accent: #ffea00;
+  --accent-2: #00ffff;
+  --success: #39ff14;
+  --danger: #ff073a;
+  --warning: #ffea00;
+  --text-dark: #000000;
+  --text-light: #39ff14;
+  --bg-1: #0d0d0d;
+  --bg-2: #1a1a1a;
 }
 
 * {
@@ -22,8 +22,8 @@
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  font-family: 'VT323', monospace;
+  background: var(--bg-1);
   min-height: 100vh;
 }
 

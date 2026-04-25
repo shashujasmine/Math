@@ -1,14 +1,14 @@
 :root {
-  --primary: #ff6b9d;
-  --primary-light: #ffa5c3;
-  --secondary: #845ef7;
-  --accent: #ffd43b;
-  --accent-2: #20c997;
-  --success: #51cf66;
-  --danger: #ff6b6b;
-  --warning: #ffd43b;
-  --text-dark: #212529;
-  --text-light: #f8f9fa;
+  --primary: #39ff14;
+  --primary-light: #7fff5c;
+  --secondary: #ff6b00;
+  --accent: #ffea00;
+  --accent-2: #00ffff;
+  --success: #39ff14;
+  --danger: #ff073a;
+  --warning: #ffea00;
+  --text-dark: #000000;
+  --text-light: #39ff14;
 }
 
 .question-card {
@@ -23,6 +23,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes choiceEntrance {
+  from {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }
 
@@ -60,7 +71,8 @@
   color: white;
   text-align: center;
   letter-spacing: 3px;
-  font-family: 'Fredoka', sans-serif;
+  font-family: 'Orbitron', sans-serif;
+  color: #ffffff;
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 1;
@@ -73,13 +85,37 @@
   margin-bottom: 2rem;
 }
 
+.choices-grid .choice-button:nth-child(1) {
+  animation: choiceEntrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.choices-grid .choice-button:nth-child(2) {
+  animation: choiceEntrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.18s;
+  opacity: 0;
+}
+
+.choices-grid .choice-button:nth-child(3) {
+  animation: choiceEntrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.26s;
+  opacity: 0;
+}
+
+.choices-grid .choice-button:nth-child(4) {
+  animation: choiceEntrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.34s;
+  opacity: 0;
+}
+
 .choice-button {
   padding: 1.5rem;
   background: white;
   border: 3px solid #f1f3f5;
   border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -88,6 +124,25 @@
   color: var(--text-dark);
   position: relative;
   overflow: hidden;
+}
+
+.choice-button::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+.choice-button:active:not(:disabled)::after {
+  transform: scale(2);
+  opacity: 1;
 }
 
 .choice-button::before {

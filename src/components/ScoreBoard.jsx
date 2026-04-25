@@ -3,6 +3,7 @@ import { getStreakMessage } from '../utils/QuizLogic';
 import '../styles/ScoreBoard.css';
 
 const ScoreBoard = ({ score, total, streak, timeLeft, questionTimeLeft, difficulty, gameMode, pulseScore }) => {
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

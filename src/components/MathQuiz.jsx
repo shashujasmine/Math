@@ -8,8 +8,10 @@ import {
 import MathQuestionCard from './MathQuestionCard';
 import ScoreBoard from './ScoreBoard';
 import ScorePopup from './ScorePopup';
+import Confetti from './Confetti';
 import '../styles/MathQuiz.css';
 import '../styles/ScorePopup.css';
+import '../styles/Confetti.css';
 
 const MathQuiz = () => {
   const [difficulty, setDifficulty] = useState(DIFFICULTY_LEVELS.MEDIUM);
@@ -20,19 +22,20 @@ const MathQuiz = () => {
   const [streak, setStreak] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
-  const [gameStatus, setGameStatus] = useState('start'); // start, playing, correct, wrong, finished
+  const [gameStatus, setGameStatus] = useState('start'); 
   const [, setQuestionsAnswered] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
-  const [gameMode, setGameMode] = useState('timed'); // timed or unlimited
+  const [timeLeft, setTimeLeft] = useState(120); 
+  const [gameMode, setGameMode] = useState('timed'); 
   const [showScorePopup, setShowScorePopup] = useState(false);
-  const [questionTimeLeft, setQuestionTimeLeft] = useState(10); // 10 seconds per question
+  const [questionTimeLeft, setQuestionTimeLeft] = useState(10); 
+  const [showConfetti, setShowConfetti] = useState(false); 
   
-  // Use refs to prevent stale closures
+
   const timeoutRef = useRef(null);
   const questionTimeoutRef = useRef(null);
   const isComponentMountedRef = useRef(true);
 
-  // DEFINE ALL CALLBACKS FIRST before useEffect
+
   const handleGameEnd = useCallback(() => {
     if (!isComponentMountedRef.current) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -105,6 +108,8 @@ const MathQuiz = () => {
         setStreak(s => s + 1);
         setGameStatus('correct');
         setShowScorePopup(true);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 2000);
       } else {
         setStreak(0);
         setGameStatus('wrong');
@@ -168,7 +173,7 @@ const MathQuiz = () => {
     }
   }, [totalQuestions]);
 
-  // NOW define all useEffect hooks after callbacks
+
   useEffect(() => {
     isComponentMountedRef.current = true;
     
@@ -390,6 +395,7 @@ const MathQuiz = () => {
         <div className="floating-shape"></div>
         <div className="floating-shape"></div>
       </div>
+      <Confetti active={showConfetti} />
       <ScorePopup 
         isVisible={showScorePopup}
         onAnimationComplete={() => setShowScorePopup(false)}
