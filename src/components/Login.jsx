@@ -49,13 +49,13 @@ const Login = ({ onLogin }) => {
           <div className="login-header">
             <div className="login-logo">
               <div className="login-logo-icon">
-                <span className="logo-bracket">&lt;</span>
+                <span className="logo-math">∑</span>
+                <span className="logo-slash">/</span>
                 <span className="logo-letter">C</span>
-                <span className="logo-bracket">/&gt;</span>
               </div>
             </div>
             <h1 className="login-title">Quiz Master</h1>
-            <p className="login-subtitle">Sign in to start your C Programming challenge</p>
+            <p className="login-subtitle">Sign in to start your Math & C Programming challenge</p>
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>

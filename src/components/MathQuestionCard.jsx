@@ -5,7 +5,11 @@ const MathQuestionCard = ({ question, choices, selectedAnswer, correctAnswer, sh
   return (
     <div className="question-card">
       <div className="question-display">
-        <div className="question-text">{question.question}</div>
+        <div className="question-story">{question.question}</div>
+        <div className="question-logic-guide">
+          <span className="guide-label">Mission Logic:</span>
+          <span className="guide-equation">{question.equation}</span>
+        </div>
       </div>
 
       <div className="choices-grid">

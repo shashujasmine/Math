@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import CQuiz from './components/CQuiz';
 import CQuizResult from './components/CQuizResult';
 import MathQuiz from './components/MathQuiz';
+import StoryIntro from './components/StoryIntro';
 import './styles/MathQuiz.css';
 
 function App() {
@@ -13,6 +14,10 @@ function App() {
 
   const handleLogin = useCallback((userData) => {
     setUser(userData);
+    setCurrentPage('story');
+  }, []);
+
+  const handleStoryComplete = useCallback(() => {
     setCurrentPage('dashboard');
   }, []);
 
@@ -49,6 +54,9 @@ function App() {
   switch (currentPage) {
     case 'login':
       return <Login onLogin={handleLogin} />;
+
+    case 'story':
+      return <StoryIntro user={user} onComplete={handleStoryComplete} />;
 
     case 'dashboard':
       return (

@@ -61,8 +61,35 @@ export const generateQuestion = (difficulty = DIFFICULTY_LEVELS.MEDIUM, type = Q
       answer = num1 + num2;
   }
 
+  const stories = {
+    [QUESTION_TYPES.ADDITION]: [
+      `Sally is exploring a sun-drenched orchard. She finds ${num1} ripe pears on the ground and then picks ${num2} more from a branch. How many pears does she have in total?`,
+      `A young alchemist has ${num1} blue dragon scales. If they find ${num2} more in a hidden cave, how many scales will they have for their potion?`,
+      `In a magical forest, ${num1} fireflies are dancing. ${num2} more join the party. How many fireflies are lighting up the woods now?`
+    ],
+    [QUESTION_TYPES.SUBTRACTION]: [
+      `A brave explorer starts with ${num1} golden coins. After spending ${num2} coins on a map of the Lost City, how many coins remain in their pouch?`,
+      `There are ${num1} apples in a basket. If a group of friendly deer comes by and eats ${num2} of them, how many apples are left?`,
+      `A wizard has ${num1} magic scrolls. They use ${num2} scrolls to cast a rain-making spell. How many scrolls does the wizard have left?`
+    ],
+    [QUESTION_TYPES.MULTIPLICATION]: [
+      `A baker is making ${num1} trays of cosmic cookies. Each tray holds ${num2} cookies. How many cookies are being baked in total?`,
+      `There are ${num1} spider-bots in a high-tech lab. If each bot has ${num2} glowing eyes, how many eyes are watching from the shadows?`,
+      `A gardener plants ${num1} rows of sun-flowers. If there are ${num2} flowers in each row, how many flowers will bloom in the garden?`
+    ],
+    [QUESTION_TYPES.DIVISION]: [
+      `A treasure hunter finds ${num1} ancient gems. If they want to share them equally among ${num2} treasure chests, how many gems will go into each chest?`,
+      `A spaceship has ${num1} energy cells. If it uses ${num2} cells for every light-year it travels, how many light-years can it fly?`,
+      `There are ${num1} students going on a field trip. If each bus can carry ${num2} students, how many buses are needed for the journey?`
+    ]
+  };
+
+  const selectedStories = stories[selectedType] || stories[QUESTION_TYPES.ADDITION];
+  const storyTemplate = selectedStories[Math.floor(Math.random() * selectedStories.length)];
+
   return {
-    question: `${num1} ${operator} ${num2} = ?`,
+    question: storyTemplate,
+    equation: `${num1} ${operator} ${num2} = ?`,
     answer,
     difficulty
   };
