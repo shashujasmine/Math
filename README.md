@@ -3,7 +3,7 @@
 An interactive, multi-module quiz platform built with **React 19** and **Vite**. Challenge yourself with a **C Programming Quiz** and a **Math Master** speed round — all wrapped in a stunning, modern UI with glassmorphism effects, smooth animations, and detailed performance analytics.
 
 ---
-
+NOTE: "the sign-up page is just for the user to login , it is not a strong authentication system . It is just to rectify the user."
 ##  Features
 
 ###  Authentication
